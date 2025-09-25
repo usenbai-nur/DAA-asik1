@@ -1,24 +1,20 @@
 package algorithms;
 
 public class Metrics {
-    public long comparisons = 0;
-    public long moves = 0;
-    public int currentDepth = 0;
-    public int maxDepth = 0;
+    public long runTime;
+    public long counter;
+    public long depth;
+    public long allocation;
 
-    public void incDepth() {
-        currentDepth++;
-        maxDepth = Math.max(maxDepth, currentDepth);
+    public Metrics(long runTime, long counter, long depth, long allocation) {
+        this.runTime = runTime;
+        this.counter = counter;
+        this.depth = depth;
+        this.allocation = allocation;
     }
 
-    public void decDepth() {
-        currentDepth--;
-    }
-
-    public void reset() {
-        comparisons = 0;
-        moves = 0;
-        currentDepth = 0;
-        maxDepth = 0;
+    @Override
+    public String toString() {
+        return runTime + ";" + counter + ";" + depth + ";" + allocation;
     }
 }

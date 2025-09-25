@@ -1,28 +1,30 @@
 package algorithms;
 
-import java.util.Random;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
-        Metrics metrics = new Metrics();
-        Random rnd = new Random();
+    public static void main(String[] args) throws IOException {
+        try (FileWriter writer = new FileWriter("results.csv")) {
+            writer.write("algorithmName;runTime;counter;depth;allocation\n");
 
-        int n = 1 << 15;
-        int[] arr = rnd.ints(n, 0, 1_000_000).toArray();
+            int[] arr = {5, 2, 9, 1, 6};
 
-        int[] copy1 = arr.clone();
-        metrics.reset();
-        long t1 = System.nanoTime();
-        new MergeSort(metrics).sort(copy1);
-        long t2 = System.nanoTime();
-        System.out.println("MergeSort time: " + (t2 - t1) + " ns, depth=" + metrics.maxDepth);
+            MergeSort ms = new MergeSort();
+            Metrics m1 = ms.sort(arr.clone());
+            writer.write("MergeSort;" + m1 + "\n");
 
-        int[] copy2 = arr.clone();
-        metrics.reset();
-        t1 = System.nanoTime();
-        new QuickSort(metrics).sort(copy2);
-        t2 = System.nanoTime();
-        System.out.println("QuickSort time: " + (t2 - t1) + " ns, depth=" + metrics.maxDepth);
+            QuickSort qs = new QuickSort();
+            Metrics m2 = qs.sort(arr.clone());
+            writer.write("QuickSort;" + m2 + "\n");
 
+            DeterministicSelect ds = new DeterministicSelect();
+            Metrics m3 = ds.select(arr.clone(), 2);
+            writer.write("DeterministicSelect;" + m3 + "\n");
+
+            ClosestPair cp = new ClosestPair();
+            Metrics m4 = cp.findClosest(new int[][]{{0,0},{1,1},{2,2}});
+            writer.write("ClosestPair;" + m4 + "\n");
+        }
     }
 }

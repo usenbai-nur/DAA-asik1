@@ -3,50 +3,50 @@ package algorithms;
 import java.util.Random;
 
 public class QuickSort {
-    private final Metrics m;
-    private final Random rnd = new Random();
+    private int counter;
+    private int depth;
+    private Random rand = new Random();
 
-    public QuickSort(Metrics metrics) {
-        this.m = metrics;
+    public Metrics sort(int[] arr) {
+        counter = 0;
+        depth = 0;
+        long start = System.nanoTime();
+
+        quickSort(arr, 0, arr.length - 1, 0);
+
+        long end = System.nanoTime();
+        return new Metrics(end - start, counter, depth, arr.length);
     }
 
-    public void sort(int[] arr) {
-        quicksort(arr, 0, arr.length - 1);
+    private void quickSort(int[] arr, int low, int high, int level) {
+        depth = Math.max(depth, level);
+        if (low < high) {
+            int p = partition(arr, low, high);
+            quickSort(arr, low, p - 1, level + 1);
+            quickSort(arr, p + 1, high, level + 1);
+        }
     }
 
-    private void quicksort(int[] arr, int lo, int hi) {
-        while (lo < hi) {
-            m.incDepth();
-            int p = partition(arr, lo, hi);
-            int left = p - lo, right = hi - p;
-            if (left < right) {
-                quicksort(arr, lo, p - 1);
-                lo = p + 1;
-            } else {
-                quicksort(arr, p + 1, hi);
-                hi = p - 1;
+    private int partition(int[] arr, int low, int high) {
+        int pivotIndex = low + rand.nextInt(high - low + 1);
+        int pivot = arr[pivotIndex];
+        swap(arr, pivotIndex, high);
+
+        int i = low;
+        for (int j = low; j < high; j++) {
+            counter++;
+            if (arr[j] <= pivot) {
+                swap(arr, i, j);
+                i++;
             }
-            m.decDepth();
         }
-    }
-
-    private int partition(int[] arr, int lo, int hi) {
-        int pivotIndex = lo + rnd.nextInt(hi - lo + 1);
-        swap(arr, lo, pivotIndex);
-        int pivot = arr[lo];
-        int i = lo + 1, j = hi;
-        while (true) {
-            while (i <= hi && arr[i] <= pivot) { m.comparisons++; i++; }
-            while (arr[j] > pivot) { m.comparisons++; j--; }
-            if (i >= j) break;
-            swap(arr, i, j);
-        }
-        swap(arr, lo, j);
-        return j;
+        swap(arr, i, high);
+        return i;
     }
 
     private void swap(int[] arr, int i, int j) {
-        int tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
-        m.moves += 3;
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
 }

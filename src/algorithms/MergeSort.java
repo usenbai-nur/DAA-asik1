@@ -1,55 +1,66 @@
 package algorithms;
 
 public class MergeSort {
-    private final Metrics m;
+    private int counter;
+    private int depth;
 
-    public MergeSort(Metrics metrics) {
-        this.m = metrics;
+    public Metrics sort(int[] arr) {
+        counter = 0;
+        depth = 0;
+        long start = System.nanoTime();
+
+        mergeSort(arr, 0, arr.length - 1, 0);
+
+        long end = System.nanoTime();
+        return new Metrics(end - start, counter, depth, arr.length);
     }
 
-    public void sort(int[] arr) {
-        int[] buffer = new int[arr.length];
-        mergeSort(arr, buffer, 0, arr.length - 1);
-    }
+    private void mergeSort(int[] arr, int left, int right, int level) {
+        depth = Math.max(depth, level);
 
-    private void mergeSort(int[] arr, int[] buffer, int lo, int hi) {
-        if (hi - lo <= 32) { // cutoff to insertion sort
-            insertionSort(arr, lo, hi);
-            return;
+        if (left < right) {
+            int mid = (left + right) / 2;
+            mergeSort(arr, left, mid, level + 1);
+            mergeSort(arr, mid + 1, right, level + 1);
+            merge(arr, left, mid, right);
         }
-        m.incDepth();
-        int mid = (lo + hi) >>> 1;
-        mergeSort(arr, buffer, lo, mid);
-        mergeSort(arr, buffer, mid + 1, hi);
-        merge(arr, buffer, lo, mid, hi);
-        m.decDepth();
     }
 
-    private void merge(int[] arr, int[] buffer, int lo, int mid, int hi) {
-        int i = lo, j = mid + 1, k = lo;
-        while (i <= mid && j <= hi) {
-            m.comparisons++;
-            if (arr[i] <= arr[j]) buffer[k++] = arr[i++];
-            else buffer[k++] = arr[j++];
-            m.moves++;
+    private void merge(int[] arr, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        int[] L = new int[n1];
+        int[] R = new int[n2];
+
+        for (int i = 0; i < n1; ++i) {
+            L[i] = arr[left + i];
+            counter++;
         }
-        while (i <= mid) buffer[k++] = arr[i++];
-        while (j <= hi) buffer[k++] = arr[j++];
-        for (int t = lo; t <= hi; t++) arr[t] = buffer[t];
-    }
+        for (int j = 0; j < n2; ++j) {
+            R[j] = arr[mid + 1 + j];
+            counter++;
+        }
 
-    private void insertionSort(int[] arr, int lo, int hi) {
-        for (int i = lo + 1; i <= hi; i++) {
-            int key = arr[i];
-            int j = i - 1;
-            while (j >= lo && arr[j] > key) {
-                m.comparisons++;
-                arr[j + 1] = arr[j];
-                j--;
-                m.moves++;
+        int i = 0, j = 0;
+        int k = left;
+        while (i < n1 && j < n2) {
+            counter++;
+            if (L[i] <= R[j]) {
+                arr[k++] = L[i++];
+            } else {
+                arr[k++] = R[j++];
             }
-            arr[j + 1] = key;
-            m.moves++;
+        }
+
+        while (i < n1) {
+            arr[k++] = L[i++];
+            counter++;
+        }
+
+        while (j < n2) {
+            arr[k++] = R[j++];
+            counter++;
         }
     }
 }
