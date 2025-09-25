@@ -8,12 +8,14 @@ public class Metrics {
 
     public void incDepth() {
         currentDepth++;
-        Math.max(maxDepth, currentDepth);
+        maxDepth = Math.max(maxDepth, currentDepth);
     }
+
     public void decDepth() {
         currentDepth--;
     }
-    public void reset(){
+
+    public void reset() {
         comparisons = 0;
         moves = 0;
         currentDepth = 0;
